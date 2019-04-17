@@ -214,4 +214,13 @@ class TwoCenterLineView(ctx : Context) : View(ctx) {
             }
         }
     }
+
+    companion object {
+
+        fun create(activity : Activity) : TwoCenterLineView {
+            val view : TwoCenterLineView = TwoCenterLineView(activity)
+            activity.setContentView(view)
+            return view 
+        }
+    }
 }
