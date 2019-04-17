@@ -34,11 +34,13 @@ fun Float.updateValue(dir : Float, a : Int, b : Int) : Float = mirrorValue(a, b)
 fun Canvas.drawTCL(i : Int, size : Float, w : Float, sc1 : Float, sc2 : Float, paint : Paint) {
     val r : Float = size / rFactor
     val sc : Float = sc2.divideScale(i, second_part_size)
+    val lineX1 : Float = -size * sc1.divideScale(0, first_part_size)
+    val lineX2 : Float = size * sc.divideScale(0, second_part_size)
     save()
     rotate(-angleDeg * i * sc1.divideScale(1, first_part_size))
-    translate(size + (w + r) * sc, 0f)
-    drawCircle(size, 0f, r, paint)
-    drawLine( -size * sc1.divideScale(0, first_part_size), 0f, -size * sc, 0f, paint)
+    translate(size, 0f)
+    drawCircle((w + r) * sc.divideScale(1, second_part_size),0f, r, paint)
+    drawLine(lineX1 + lineX2, 0f, 0f, 0f, paint)
     restore()
 }
 
@@ -53,7 +55,7 @@ fun Canvas.drawTCLNode(i : Int, scale : Float, paint : Paint) {
     save()
     translate(w / 2, gap * (i + 1))
     for (j in 0..(second_part_size - 1)) {
-        drawTCL(j, size, scale.divideScale(0, second_part_size), w / 2, scale.divideScale(1, second_part_size), paint)
+        drawTCL(j, size, w / 2, scale.divideScale(0, second_part_size), scale.divideScale(1, second_part_size), paint)
     }
     restore()
 }
@@ -79,7 +81,7 @@ class TwoCenterLineView(ctx : Context) : View(ctx) {
     data class State(var scale : Float = 0f, var prevScale : Float = 0f, var dir : Float = 0f) {
 
         fun update(cb : (Float) -> Unit) {
-            scale += scale.updateValue(dir, first_part_size, second_part_size)
+            scale += scale.updateValue(dir, first_part_size, second_part_size * second_part_size)
             if (Math.abs(scale - prevScale) > 1) {
                 scale = prevScale + dir
                 dir = 0f
@@ -220,7 +222,7 @@ class TwoCenterLineView(ctx : Context) : View(ctx) {
         fun create(activity : Activity) : TwoCenterLineView {
             val view : TwoCenterLineView = TwoCenterLineView(activity)
             activity.setContentView(view)
-            return view 
+            return view
         }
     }
 }
