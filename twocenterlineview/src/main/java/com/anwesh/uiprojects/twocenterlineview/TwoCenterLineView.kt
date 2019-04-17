@@ -116,6 +116,12 @@ class TwoCenterLineView(ctx : Context) : View(ctx) {
                 view.postInvalidate()
             }
         }
+
+        fun stop() {
+            if (animated) {
+                animated = false
+            }
+        }
     }
 
     data class TCLNode(var i : Int, val state : State = State()) {
@@ -183,6 +189,28 @@ class TwoCenterLineView(ctx : Context) : View(ctx) {
 
         fun startUpdating(cb : () -> Unit) {
             curr.startUpdating(cb)
+        }
+    }
+
+    data class Renderer(var view : TwoCenterLineView) {
+
+        private val animator : Animator = Animator(view)
+        private val tcl : TwoCenterLine = TwoCenterLine(0)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(backColor)
+            tcl.draw(canvas, paint)
+            animator.animate {
+                tcl.update {i, scl ->
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            tcl.startUpdating {
+                animator.start()
+            }
         }
     }
 }
